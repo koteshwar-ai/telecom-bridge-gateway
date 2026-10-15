@@ -1,0 +1,18 @@
+services:
+  simulator:
+    build: .
+    image: telecom-bridge-gateway:local
+    # Same fat jar, different main class (Spring Boot PropertiesLauncher honours loader.main)
+    entrypoint: ["java", "-Dloader.main=com.pyrogroup.telecom_bridge_gateway.simulator.SimulatorMain",
+                 "-cp", "/app/app.jar", "org.springframework.boot.loader.launch.PropertiesLauncher"]
+    ports:
+      - "3868:3868"
+
+  gateway:
+    image: telecom-bridge-gateway:local
+    depends_on:
+      - simulator
+    environment:
+      DIAMETER_HOST: simulator
+    ports:
+      - "8080:8080"
